@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mental Health Tracker</title>
+  <style>
+    :root {
+      --bg: linear-gradient(135deg, #f6f9fc, #e0f7fa);
+      --text: #333;
+      --box: rgba(255, 255, 255, 0.25);
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      animation: fadeIn 1s ease;
+      overflow-x: hidden;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    .tracker, .history, .login-container {
+      background: var(--box);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 15px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+
+    .mood-options {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .mood-card {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 15px;
+      width: 100px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .mood-card:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    .emoji {
+      font-size: 2rem;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 1rem;
+      background: rgba(255,255,255,0.5);
+    }
+
+    button {
+      margin-top: 15px;
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(45deg, #4caf50, #81c784);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      font-size: 1rem;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(0, 200, 83, 0.3);
+      cursor: pointer;
+      transition: box-shadow 0.3s ease, transform 0.2s;
+    }
+
+    button:hover {
+      box-shadow: 0 6px 25px rgba(0, 230, 100, 0.5);
+      transform: scale(1.03);
+    }
+
+    #calendar div {
+      margin: 10px 0;
+      background: rgba(255,255,255,0.2);
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .ripple {
+      position: fixed;
+      width: 80px;
+      height: 80px;
+      background: rgba(0, 200, 83, 0.3);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      animation: ripple-anim 0.6s ease-out;
+      z-index: 9999;
+    }
+
+    @keyframes ripple-anim {
+      from { transform: scale(0); opacity: 0.6; }
+      to { transform: scale(4); opacity: 0; }
+    }
+
+    .welcome-message {
+      font-size: 1.2rem;
+      text-align: right;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .login-body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-container input {
+      padding: 12px;
+      width: 80%;
+      margin-top: 10px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      background: rgba(255,255,255,0.5);
+    }
+
+    .logout-btn {
+      background: #f44336;
+      margin-top: 10px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Login Page -->
+  <div id="loginPage" class="login-container login-body">
+    <div>
+      <h2>Welcome 👋</h2>
+      <input type="text" id="username" placeholder="Enter your name" />
+      <button onclick="login()">Log In</button>
+    </div>
+  </div>
+
+  <!-- Tracker Page -->
+  <div id="trackerPage" class="container hidden">
+    <div class="welcome-message" id="welcomeMsg"></div>
+    <button class="logout-btn" onclick="logout()">Log Out</button>
+
+    <section class="tracker">
+      <h2>Log Today’s Mood</h2>
+      <div class="mood-options">
+        <div class="mood-card" onclick="selectMood('😊 Happy')">
+          <span class="emoji">😊</span>
+          <p>Happy</p>
+        </div>
+        <div class="mood-card" onclick="selectMood('😢 Sad')">
+          <span class="emoji">😢</span>
+          <p>Sad</p>
+        </div>
+        <div class="mood-card" onclick="selectMood('😠 Angry')">
+          <span class="emoji">😠</span>
+          <p>Angry</p>
+        </div>
+        <div class="mood-card" onclick="selectMood('😌 Calm')">
+          <span class="emoji">😌</span>
+          <p>Calm</p>
+        </div>
+        <div class="mood-card" onclick="selectMood('😫 Stressed')">
+          <span class="emoji">😫</span>
+          <p>Stressed</p>
+        </div>
+        <div class="mood-card" onclick="selectMood('😴 Tired')">
+          <span class="emoji">😴</span>
+          <p>Tired</p>
+        </div>
+      </div>
+
+      <textarea id="journal" placeholder="Write about your day..."></textarea>
+      <button onclick="saveMood()">Save Entry</button>
+    </section>
+
+    <section class="history">
+      <h2>Recent Mood Entries</h2>
+      <div id="calendar"></div>
+    </section>
+  </div>
+
+  <script>
+    let selectedMood = "";
+
+    function selectMood(mood) {
+      selectedMood = mood;
+      alert("Mood selected: " + mood);
+    }
+
+    function saveMood() {
+      if (!selectedMood) {
+        alert("Please select a mood before saving.");
+        return;
+      }
+
+      const entry = {
+        date: new Date().toLocaleDateString(),
+        mood: selectedMood,
+        note: document.getElementById("journal").value
+      };
+
+      let data = JSON.parse(localStorage.getItem("moodData")) || [];
+      data.push(entry);
+      localStorage.setItem("moodData", JSON.stringify(data));
+      document.getElementById("journal").value = "";
+      selectedMood = "";
+      loadCalendar();
+    }
+
+    function loadCalendar() {
+      const calendar = document.getElementById("calendar");
+      const data = JSON.parse(localStorage.getItem("moodData")) || [];
+      calendar.innerHTML = "";
+
+      data.slice(-7).reverse().forEach(entry => {
+        const div = document.createElement("div");
+        div.innerHTML = `<strong>${entry.date}</strong><br/>${entry.mood}<br/><em>${entry.note}</em>`;
+        calendar.appendChild(div);
+      });
+    }
+
+    function login() {
+      const username = document.getElementById('username').value.trim();
+      if (username === '') {
+        alert("Please enter your name.");
+        return;
+      }
+      localStorage.setItem('mh_user', username);
+      showTracker();
+    }
+
+    function logout() {
+      localStorage.removeItem('mh_user');
+      location.reload();
+    }
+
+    function showTracker() {
+      const user = localStorage.getItem('mh_user');
+      if (user) {
+        document.getElementById("loginPage").classList.add("hidden");
+        document.getElementById("trackerPage").classList.remove("hidden");
+        document.getElementById("welcomeMsg").innerText = `Hi ${user} 👋`;
+        loadCalendar();
+      }
+    }
+
+    // Ripple effect
+    document.addEventListener('click', function(e) {
+      const ripple = document.createElement("span");
+      ripple.className = "ripple";
+      ripple.style.left = `${e.clientX}px`;
+      ripple.style.top = `${e.clientY}px`;
+      document.body.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+    });
+
+    // On page load
+    window.onload = showTracker;
+  </script>
+</body>
+</html>
